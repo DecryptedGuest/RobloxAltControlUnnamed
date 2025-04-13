@@ -99,10 +99,10 @@ local funfacts = {
 local messageReceived = game.TextChatService.TextChannels.RBXGeneral.MessageReceived
 
 local commandsMessage = {
-	"cmds, reset, say <message>, pick <options>, dance, whitelist <player>, blacklist <player>, coinflip, random <min> <max>, bring, walkto <player>",
+	"cmds, curry <player>, reset, say <message>, pick <options>, dance, whitelist <player>, blacklist <player>, coinflip, random <min> <max>, bring, walkto <player>",
 	"setprefix <newPrefix>, setstatus <newStatus>, clearStatus, point, wave, funfact, time, speed, fps, sit, rush, randommove, randomplayer, rickroll, disablecommand <command>",
 	"salute, announce <announcement>, help <command>, jobid, aliases <command>, math <operation> <nums>, changelogs, gamename, playercount, maxplayers, toggleall, setinterval",
-	"lua <lua>, ping, catch <player>, copychat <player>, cheer, stadium, spin <speed>, float <height>, orbit <speed> <radius>, jump, follow, unfollow, executor, curry"
+	"lua <lua>, ping, catch <player>, copychat <player>, cheer, stadium, spin <speed>, float <height>, orbit <speed> <radius>, jump, follow, unfollow, executor"
 }
 
 local orbitcon
@@ -732,7 +732,7 @@ commands = {
 	bring = {
 		Name = "bring",
 		Aliases = {},
-		Use = "Brings LunarBot to the player that chatted the command.",
+		Use = "Brings the Bot to the player that chatted the command.",
 		Enabled = true,
 		CommandFunction = function(msg, args, speaker)
 			pcall(function()
@@ -747,7 +747,7 @@ commands = {
 	copychat = {
 		Name = "copychat",
 		Aliases = {"cc", "copyc", "cchat"},
-		Use = "Makes LunarBot copy everything the given player says.",
+		Use = "Makes the Bot copy everything the given player says.",
 		Enabled = true,
 		CommandFunction = function(msg, args, speaker)
 			pcall(function()
@@ -775,7 +775,7 @@ commands = {
 	uncopychat = {
 		Name = "uncopychat",
 		Aliases = {"uncc", "uncopyc", "uncchat"},
-		Use = "Makes LunarBot stop copying everything the copychat player says.",
+		Use = "Makes the Bot stop copying everything the copychat player says.",
 		Enabled = true,
 		CommandFunction = function(msg, args, speaker)
 			pcall(function()
@@ -791,7 +791,7 @@ commands = {
 	to = {
 		Name = "to",
 		Aliases = {},
-		Use = "Teleports LunarBot to the <player> given.",
+		Use = "Teleports the Bot to the <player> given.",
 		Enabled = true,
 		CommandFunction = function(msg, args, speaker)
 			pcall(function()
@@ -818,7 +818,7 @@ commands = {
 	walkto = {
 		Name = "walkto",
 		Aliases = {"come"},
-		Use = "Makes LunarBot walk to you or the given player!",
+		Use = "Makes the Bot walk to you or the given player!",
 		Enabled = true,
 		CommandFunction = function(msg, args, speaker)
 			pcall(function()
@@ -843,7 +843,7 @@ commands = {
 	setprefix = {
 		Name = "setprefix",
 		Aliases = {"prefix"},
-		Use = "Sets the prefix of LunarBot! Owner-only command!",
+		Use = "Sets the prefix of the Bot! Owner-only command!",
 		Enabled = true,
 		CommandFunction = function(msg, args, speaker)
 			pcall(function()
@@ -864,7 +864,7 @@ commands = {
 	setstatus = {
 		Name = "setstatus",
 		Aliases = {},
-		Use = "Sets the status of LunarBot. When a status is set, the bot will no longer take commands.",
+		Use = "Sets the status of the Bot. When a status is set, the bot will no longer take commands from the old status.",
 		Enabled = true,
 		CommandFunction = function(msg, args, speaker)
 			pcall(function()
@@ -1330,7 +1330,7 @@ if req ~= nil then
 end
 
 task.spawn(function()
-	chat("LunarBot " .. lunarbotversion .. " // Loaded in " .. os.time() - bootTime .. " seconds!")
+	chat("The Bot " .. lunarbotversion .. " // Loaded in " .. os.time() - bootTime .. " seconds!")
 	wait(0.1)
 	chat("You can now control this client! Type " .. prefix .. "cmds to view commands.")
 end)
@@ -1338,7 +1338,7 @@ end)
 task.spawn(function()
 	while wait(300) do
 		if disconnected == false then
-			chat("LunarBot is currently active! Type " .. prefix .. "cmds to view commands.")
+			chat("This Bot is currently running! Type " .. prefix .. "cmds to view commands.")
 		end
 	end
 end)
