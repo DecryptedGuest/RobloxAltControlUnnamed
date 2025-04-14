@@ -191,50 +191,10 @@ cmds = {
 			task.wait(0.3)
 		end
 	end,
-	},
-	susdance = {
-	Name = "susdance",
-	Aliases = {},
-	Use = "Makes the bot do a sus dance!",
-	Enabled = true,
-	CommandFunction = function(msg, args, speaker)
-		local function playTwerk(char)
-			if not char then return end
-
-			local humanoid = char:FindFirstChildOfClass("Humanoid")
-			if not humanoid then return end
-
-			local animator = humanoid:FindFirstChildOfClass("Animator")
-			if not animator then
-				animator = Instance.new("Animator")
-				animator.Parent = humanoid
-			end
-
-			local anim = Instance.new("Animation")
-			anim.AnimationId = "rbxassetid://9121579056"
-
-			local track = animator:LoadAnimation(anim)
-			track.Looped = false
-			track:Play()
-		end
-
-		if altctrl and allbots then
-			for _, alt in pairs(allbots) do
-				if alt.Character then
-					playTwerk(alt.Character)
-				end
-			end
-		else
-			if bot.Character then
-				playTwerk(bot.Character)
-			end
-		end
-	end,
-},
 	backshots = {
 	Name = "backshots",
 	Aliases = {},
-	Use = "Bots move behind the target player and go back and forth while chatting.",
+	Use = "Bots move behind the target player and go back and forth while saying things.",
 	Enabled = true,
 	CommandFunction = function(msg, args, speaker)
 		local targetName = args[2]
@@ -263,7 +223,7 @@ cmds = {
 			loopFlag.Name = "BackshotsLoop"
 			loopFlag.Parent = bot
 
-			local lastMessageTime = 0  -- Time tracker for message cooldown
+			local lastMessageTime = 0
 
 			task.spawn(function()
 				while loopFlag.Parent do
@@ -272,23 +232,23 @@ cmds = {
 
 					local botHRP = bot.Character.HumanoidRootPart
 
-					-- Position behind target
+					-- Move behind target
 					local backPos = targetHRP.CFrame * CFrame.new(0, 0, 3)
 					botHRP.CFrame = CFrame.new(backPos.Position, targetHRP.Position)
 
-					wait(0.15) -- Faster movement
+					wait(0.15)
 
-					-- Step in closer
+					-- Move in closer
 					local closePos = targetHRP.CFrame * CFrame.new(0, 0, 1.5)
 					botHRP.CFrame = CFrame.new(closePos.Position, targetHRP.Position)
 
-					wait(0.15) -- Faster movement
+					wait(0.15)
 
-					-- Chat message every 10 seconds
+					-- Say something every 10 seconds
 					if tick() - lastMessageTime >= 10 then
 						local msg = chatMessages[math.random(1, #chatMessages)]
-						game.TextChatService.TextChannels.RBXGeneral:SendAsync(bot.Name .. ": " .. msg)
-						lastMessageTime = tick()  -- Update the last message time
+						game.TextChatService.TextChannels.RBXGeneral:SendAsync(msg)
+						lastMessageTime = tick()
 					end
 				end
 			end)
