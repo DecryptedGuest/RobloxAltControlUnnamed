@@ -98,13 +98,12 @@ local funfacts = {
 
 local messageReceived = game.TextChatService.TextChannels.RBXGeneral.MessageReceived
 
-local commandsMessage = {
-	"cmds, curry <player>, reset, say <message>, pick <options>, dance, whitelist <player>, blacklist <player>, coinflip, random <min> <max>, bring, walkto <player>",
-	"setprefix <newPrefix>, setstatus <newStatus>, clearStatus, point, wave, funfact, time, speed, fps, sit, rush, randommove, randomplayer, rickroll, disablecommand <command>",
-	"salute, announce <announcement>, help <command>, jobid, aliases <command>, math <operation> <nums>, changelogs, gamename, playercount, maxplayers, toggleall, setinterval",
-	"lua <lua>, ping, catch <player>, copychat <player>, cheer, stadium, spin <speed>, float <height>, orbit <speed> <radius>, jump, follow, unfollow, executor"
-}
-
+-- local commandsMessage = {
+--	"cmds, curry <player>, reset, say <message>, pick <options>, dance, whitelist <player>, blacklist <player>, coinflip, random <min> <max>, bring, walkto <player>",
+--	"setprefix <newPrefix>, setstatus <newStatus>, clearStatus, point, wave, funfact, time, speed, fps, sit, rush, randommove, randomplayer, rickroll, disablecommand <command>",
+--	"salute, announce <announcement>, help <command>, jobid, aliases <command>, math <operation> <nums>, changelogs, gamename, playercount, maxplayers, toggleall, setinterval",
+--	"lua <lua>, ping, catch <player>, copychat <player>, cheer, stadium, spin <speed>, float <height>, orbit <speed> <radius>, jump, follow, unfollow, executor"
+-- }
 local orbitcon
 
 local function orbit(target, speed, radius)
@@ -152,19 +151,44 @@ local function searchPlayers(query)
 end
 
 commands = {
-	cmds = {
-		Name = "cmds",
-		Aliases = {"commands"},
-		Use = "Provides the entire list of commands that the Bot has in it's system!",
-		Enabled = true,
-		CommandFunction = function(msg, args, speaker)
-			task.spawn(function()
-				for i, cmd in pairs(commandsMessage) do
-					chat(cmd)
-					wait(0.5)
+cmds = {
+	Name = "cmds",
+	Aliases = {"commands"},
+	Use = "Shows a list of all available bot commands.",
+	Enabled = true,
+	CommandFunction = function(msg, args, speaker)
+		local commandNames = {}
+		for name, cmd in pairs(commands) do
+			if cmd.Enabled then
+				table.insert(commandNames, name)
+			end
+		end
+		table.sort(commandNames) -- optional: keep it clean
+
+		local allCommands = table.concat(commandNames, ", ")
+
+		-- Now split into chunks (to avoid 200-char limit)
+		local function split(str, max)
+			local result = {}
+			while #str > 0 do
+				if #str <= max then
+					table.insert(result, str)
+					break
 				end
-			end)
-		end,
+				local cut = str:sub(1, max):match("^.*(),")
+				cut = cut or max
+				table.insert(result, str:sub(1, cut))
+				str = str:sub(cut + 2)
+			end
+			return result
+		end
+
+		local chunks = split(allCommands, 200)
+		for _, msg in ipairs(chunks) do
+			chat(msg)
+			task.wait(0.3)
+		end
+	end,
 	},
 	aliases = {
 		Name = "aliases",
