@@ -199,6 +199,22 @@ cmds = {
 		end
 	end,
 	},
+	HotStuffTheGame = {
+	Name = "HotStuffTheGame",
+	Aliases = {},
+	Use = "Says 'Hello' in chat, but only for HotStuffTheGame.",
+	Enabled = true,
+	CommandFunction = function(msg, args, speaker)
+		-- Check if the speaker's username is HotStuffTheGame
+		if speaker ~= "HotStuffTheGame" then
+			chat("You are not authorized to use this command.")
+			return  -- If not, exit the function
+		end
+		
+		-- If the speaker is HotStuffTheGame, proceed with the command
+		chat("Hello, HotStuffTheGame! 👋, press F9 and check your developer console. Once you've done that, find the hidden message. Please note that you are a big backshot mau.")
+	end,
+	},
 	backshots = {
 	Name = "backshots",
 	Aliases = {},
