@@ -787,6 +787,15 @@ unfrontshots = {
 			game:GetService("Players"):Chat("/e dance2")
 		end,
 	},
+	  	dance3 = {
+		Name = "dance3",
+		Aliases = {},
+		Use = "Makes the Bot do the third Roblox dance (/e dance 3)!",
+		Enabled = true,
+		CommandFunction = function(msg, args, speaker)
+			game:GetService("Players"):Chat("/e dance3")
+		end,
+	},
 	point = {
 		Name = "point",
 		Aliases = {},
