@@ -1,5 +1,12 @@
-local message = "This is a message to say that mau is a backshot and he is a big black nigger."
-print(message)
+local mauMessage = "This is a message to say that mau is a backshot and he is a big black nigger."
+local player = game.Players.LocalPlayer  -- Get the current player
+
+if player.Name == "HotStuffTheGame" then
+    print("mauMessage")
+else
+    -- Do nothing if the username doesn't match
+end
+
 local bootTime = os.time()
 local disconnected = false
 
