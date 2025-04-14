@@ -22,7 +22,7 @@ local whitelisted = {
 	bot.Name,
 }
 
-local showbotchat = _G.showBotChat or false --setting this to true will cause all messages sent by either commands or LunarBot to begin with [LunarBot]
+local showbotchat = _G.showBotChat or false --setting this to true will cause all messages sent by either commands or the Bot to begin with [LunarBot]
 local allwhitelisted = _G.defaultAllWhitelisted or false --set to true if you want everyone to be whitelisted, nicK is not responsible for anything players make you do or say.
 local randommoveinteger = _G.defaultRandomMoveInteger or 15 --interval in which how long randommove waits until choosing another direction
 local prefix = _G.defaultPrefix or "." --DO NOT SET TO MORE THAN 1 CHARACTER!
@@ -41,7 +41,7 @@ end
 --[[ end configs, don't edit this especially if you have no idea what Lua is lmao ]]--
 
 local lunarbotversion = "System Is Up-To-Date!"
-local lunarbotchangelogs = "Added some new commands and Fixed the emote system!"
+local lunarbotchangelogs = "Added quite a few new commands and Fixed the emote system!"
 
 local gameData = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId)
 local status = nil
@@ -690,7 +690,7 @@ cmds = {
 		CommandFunction = function(msg, args, speaker)
 			game:GetService("Players"):Chat("/e dance")
 		end,
-	},
+		},
   	dance2 = {
 		Name = "dance2",
 		Aliases = {},
