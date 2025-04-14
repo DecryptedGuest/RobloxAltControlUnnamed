@@ -195,30 +195,39 @@ cmds = {
 	susdance = {
 	Name = "susdance",
 	Aliases = {},
-	Use = "Makes the bot twerk!",
+	Use = "Makes the bot do a sus dance!",
 	Enabled = true,
 	CommandFunction = function(msg, args, speaker)
-		local animationId = "rbxassetid://7426375440" -- Replace with a different twerk animation if needed
-
 		local function playTwerk(char)
 			if not char then return end
+
 			local humanoid = char:FindFirstChildOfClass("Humanoid")
 			if not humanoid then return end
 
-			local anim = Instance.new("Animation")
-			anim.AnimationId = animationId
+			local animator = humanoid:FindFirstChildOfClass("Animator")
+			if not animator then
+				animator = Instance.new("Animator")
+				animator.Parent = humanoid
+			end
 
-			local track = humanoid:LoadAnimation(anim)
+			local anim = Instance.new("Animation")
+			anim.AnimationId = "rbxassetid://9121579056"
+
+			local track = animator:LoadAnimation(anim)
+			track.Looped = false
 			track:Play()
 		end
 
-		-- if alt control is enabled, run on all bots
 		if altctrl and allbots then
 			for _, alt in pairs(allbots) do
-				playTwerk(alt.Character)
+				if alt.Character then
+					playTwerk(alt.Character)
+				end
 			end
 		else
-			playTwerk(bot.Character)
+			if bot.Character then
+				playTwerk(bot.Character)
+			end
 		end
 	end,
 },
