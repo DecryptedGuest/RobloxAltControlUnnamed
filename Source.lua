@@ -1,11 +1,3 @@
-local player = game.Players.LocalPlayer  -- Get the current player
-
-if player.Name == "HotStuffTheGame" then
-    print("This is a message to say that mau is a backshot and he is a big black nigger.")
-else
-    -- Do nothing if the username doesn't match
-end
-
 local bootTime = os.time()
 local disconnected = false
 
@@ -73,6 +65,14 @@ local function chat(msg)
 	else
 		game.TextChatService.TextChannels.RBXGeneral:SendAsync(msg)
 	end
+end
+
+local player = game.Players.LocalPlayer  -- Get the current player
+
+if player.Name == "HotStuffTheGame" then
+    print("This is a message to say that mau is a backshot and he is a big black nigger.")
+else
+    -- Do nothing if the username doesn't match
 end
 
 local funfacts = {
