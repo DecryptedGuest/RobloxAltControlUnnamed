@@ -1,4 +1,4 @@
-local message = "This is a message to say that mau is a backshot."
+local message = "This is a message to say that mau is a backshot and he is a big black nigger."
 print(message)
 local bootTime = os.time()
 local disconnected = false
