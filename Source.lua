@@ -1,3 +1,5 @@
+print("os:", os)
+print("os.time:", os and os.time)
 local bootTime = os.time()
 local disconnected = false
 
