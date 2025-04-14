@@ -251,7 +251,7 @@ cmds = {
 		end
 
 		local chatMessages = {
-			"👀", "yo chill", "lmao", "nahhh", "👣", "he doesn’t even know", "💀", "this is personal", "backshots mode activated", "locked on", "😂", "can't run"
+			"This is really nice and smooth", "keep going, just like that!", "do you like my backshot skills?", "you won't be able to walk after this!"
 		}
 
 		for _, bot in ipairs(allBots) do
