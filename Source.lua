@@ -67,6 +67,8 @@ local function chat(msg)
 	end
 end
 
+
+
 local funfacts = {
 "My dad came back from getting the milk 0.03 seconds ago.",
 	"We are playing Roblox.",
