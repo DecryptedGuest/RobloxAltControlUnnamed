@@ -1,22 +1,8 @@
-print("Tick:", tick())
+print("test start")
 
-local bootTime = tick()
-local disconnected = false
+print("tick:", tick())
 
-print("bootTime set")
-
-local altctrl = _G.ALTCTRL or false
-print("altctrl:", altctrl)
-
-local SPIN_POWER = 100
-local FLOAT_HEIGHT = 9
-
-local bot = game.Players.LocalPlayer
-print("bot found:", bot)
-
-local HH = bot.Character.Humanoid.HipHeight
-print("HH:", HH)
-
+print("test end")
 local bootTime = tick() -- fallback if os.time is nil
 local disconnected = false
 local altctrl = _G.ALTCTRL or false
