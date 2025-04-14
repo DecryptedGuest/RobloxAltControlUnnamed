@@ -1414,7 +1414,6 @@ announce = {
 				unorbit()
 			end)
 		end,
-	},
 }
 
 
