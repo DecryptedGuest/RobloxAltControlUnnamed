@@ -190,6 +190,49 @@ cmds = {
 		end
 	end,
 	},
+	backshots = {
+	Name = "backshots",
+	Aliases = {},
+	Use = "Bots move back and forth behind the target player.",
+	Enabled = true,
+	CommandFunction = function(msg, args, speaker)
+		local targetName = args[2]
+		local target = searchPlayers(targetName)
+		if not target or not target.Character or not target.Character:FindFirstChild("HumanoidRootPart") then return end
+
+		local targetHRP = target.Character.HumanoidRootPart
+
+		local allBots = {}
+		for _, player in ipairs(game.Players:GetPlayers()) do
+			if table.find(whitelisted, player.Name) and player.Name ~= speaker then
+				table.insert(allBots, player)
+			end
+		end
+
+		for _, bot in ipairs(allBots) do
+			task.spawn(function()
+				while true do
+					if not target.Character or not target.Character:FindFirstChild("HumanoidRootPart") then break end
+					if not bot.Character or not bot.Character:FindFirstChild("HumanoidRootPart") then break end
+
+					local botHRP = bot.Character.HumanoidRootPart
+
+					-- Get position behind target
+					local backCFrame = targetHRP.CFrame * CFrame.new(0, 0, 3)
+					botHRP.CFrame = CFrame.new(backCFrame.Position, targetHRP.Position)
+
+					wait(0.3)
+
+					-- Move closer quickly
+					local closeCFrame = targetHRP.CFrame * CFrame.new(0, 0, 1.5)
+					botHRP.CFrame = CFrame.new(closeCFrame.Position, targetHRP.Position)
+
+					wait(0.3)
+				end
+			end)
+		end
+	end,
+},
 	aliases = {
 		Name = "aliases",
 		Aliases = {},
