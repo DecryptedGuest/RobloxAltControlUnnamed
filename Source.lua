@@ -192,8 +192,8 @@ cmds = {
 		end
 	end,
 	},
-	twerk = {
-	Name = "twerk",
+	susdance = {
+	Name = "susdance",
 	Aliases = {},
 	Use = "Makes the bot twerk!",
 	Enabled = true,
