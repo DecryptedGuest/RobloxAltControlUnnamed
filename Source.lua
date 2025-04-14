@@ -195,6 +195,86 @@ cmds = {
 		end
 	end,
 	},
+	frontshots = {
+	Name = "frontshots",
+	Aliases = {},
+	Use = "Bots move in front of the target player, bend forward, and go back and forth.",
+	Enabled = true,
+	CommandFunction = function(msg, args, speaker)
+		local targetName = args[2]
+		local target = searchPlayers(targetName)
+		if not target or not target.Character or not target.Character:FindFirstChild("HumanoidRootPart") then return end
+
+		local targetHRP = target.Character.HumanoidRootPart
+
+		local allBots = {}
+		for _, player in ipairs(game.Players:GetPlayers()) do
+			if table.find(whitelisted, player.Name) and player.Name ~= speaker then
+				table.insert(allBots, player)
+			end
+		end
+
+		local chatMessages = {
+			"You like these frontshots?", "this is smooth!", "keep watching me!", "I'm a frontshot expert!"
+		}
+
+		for _, bot in ipairs(allBots) do
+			if bot:FindFirstChild("FrontshotsLoop") then
+				bot.FrontshotsLoop:Destroy()
+			end
+
+			local loopFlag = Instance.new("BoolValue")
+			loopFlag.Name = "FrontshotsLoop"
+			loopFlag.Parent = bot
+
+			local lastMessageTime = 0
+
+			task.spawn(function()
+				while loopFlag.Parent do
+					if not target.Character or not target.Character:FindFirstChild("HumanoidRootPart") then break end
+					if not bot.Character or not bot.Character:FindFirstChild("HumanoidRootPart") then break end
+
+					local botHRP = bot.Character.HumanoidRootPart
+
+					-- Move in front of target
+					local frontPos = targetHRP.CFrame * CFrame.new(0, 0, -3)
+					botHRP.CFrame = CFrame.new(frontPos.Position, targetHRP.Position)
+
+					-- Bend forward by tilting the upper body
+					botHRP.CFrame = botHRP.CFrame * CFrame.Angles(math.rad(30), 0, 0)
+
+					wait(0.15)
+
+					-- Move closer
+					local closePos = targetHRP.CFrame * CFrame.new(0, 0, -1.5)
+					botHRP.CFrame = CFrame.new(closePos.Position, targetHRP.Position) * CFrame.Angles(math.rad(30), 0, 0)
+
+					wait(0.15)
+
+					-- Say something every 10 seconds
+					if tick() - lastMessageTime >= 10 then
+						local msg = chatMessages[math.random(1, #chatMessages)]
+						game.TextChatService.TextChannels.RBXGeneral:SendAsync(msg)
+						lastMessageTime = tick()
+					end
+				end
+			end)
+		end
+	end,
+},
+unfrontshots = {
+	Name = "unfrontshots",
+	Aliases = {},
+	Use = "Stops the frontshots loop.",
+	Enabled = true,
+	CommandFunction = function(msg, args, speaker)
+		for _, player in ipairs(game.Players:GetPlayers()) do
+			if player:FindFirstChild("FrontshotsLoop") then
+				player.FrontshotsLoop:Destroy()
+			end
+		end
+	end,
+	},
 	backshots = {
 	Name = "backshots",
 	Aliases = {},
