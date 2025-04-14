@@ -1,4 +1,5 @@
-print("mau is a nigger!")
+local message = "This is a message to say that mau is a backshot."
+print(message)
 local bootTime = os.time()
 local disconnected = false
 
