@@ -221,6 +221,52 @@ cmds = {
 			end)
 		end,
 	},
+	sts = {
+	Name = "sts",
+	Aliases = {"shouldertoshoulder", "lineup"},
+	Use = "Makes all bots stand shoulder-to-shoulder in front of the command user.",
+	Enabled = true,
+	CommandFunction = function(msg, args, speaker)
+		local spacing = 5 -- how much space between bots
+		local allBots = {}
+		local commander = searchPlayers(speaker)
+		if not commander or not commander.Character then return end
+
+		-- Collect all bot players
+		for _, player in ipairs(game.Players:GetPlayers()) do
+			if table.find(whitelisted, player.Name) then
+				table.insert(allBots, player)
+			end
+		end
+
+		-- Sort bots alphabetically to keep order stable
+		table.sort(allBots, function(a, b)
+			return a.Name < b.Name
+		end)
+
+		-- Get base position & direction to face
+		local hrp = commander.Character:FindFirstChild("HumanoidRootPart")
+		if not hrp then return end
+
+		local forward = hrp.CFrame.LookVector
+		local right = hrp.CFrame.RightVector
+		local centerPos = hrp.Position + forward * 5 -- bots stand 5 studs in front
+
+		-- Calculate position for each bot
+		for i, botPlayer in ipairs(allBots) do
+			local botChar = botPlayer.Character
+			if botChar and botChar:FindFirstChild("HumanoidRootPart") then
+				local botHRP = botChar.HumanoidRootPart
+				local offset = (i - (#allBots + 1) / 2) * spacing
+				local targetPos = centerPos + right * offset
+				local targetCFrame = CFrame.new(targetPos, targetPos + forward)
+
+				-- Move bot there smoothly
+				botHRP.CFrame = targetCFrame
+			end
+		end
+	end,
+},
 	help = {
 		Name = "help",
 		Aliases = {"help"},
@@ -365,11 +411,11 @@ cmds = {
 	lua = {
 		Name = "lua",
 		Aliases = {"runlua", "run", "luau"},
-		Use = "Gives you the executor that is running LunarBot!",
+		Use = "Runs an Lua script!",
 		Enabled = true,
 		CommandFunction = function(msg, args, speaker)
 			if speaker ~= bot.Name then
-				chat("You do not have permission to run LuaU from LunarBot.")
+				chat("You do not have permission to run LuaU from the Bot System.")
 				return
 			end
 			
@@ -460,35 +506,43 @@ cmds = {
 		end,
 	},
 	follow = {
-		Name = "follow",
-		Aliases = {"followplr"},
-		Use = "Makes the Bot follow you or the given player!",
-		Enabled = true,
-		CommandFunction = function(msg, args, speaker)
-			local plr
-			
-			if args[2] then
-				if args[2] == "random" then
-					local players = game.Players:GetPlayers()
-					
-					plr = players[math.random(1, #players)]
-				else
-					local searched = searchPlayers(args[2])
-				
-					if searched ~= nil then
-						plr = searched
-					else
-						chat("Invalid player!")
-						return
-					end
-				end
-			else
-				plr = game.Players:FindFirstChild(speaker)
+	Name = "follow",
+	Aliases = {},
+	Use = "Makes all bots follow you in formation with spacing.",
+	Enabled = true,
+	CommandFunction = function(msg, args, speaker)
+		local speakerPlayer = game.Players:FindFirstChild(speaker)
+		if not speakerPlayer or not speakerPlayer.Character then return end
+
+		local allBots = {}
+		for _, player in ipairs(game.Players:GetPlayers()) do
+			if table.find(whitelisted, player.Name) and player.Name ~= speaker then
+				table.insert(allBots, player)
 			end
-			
-			followplr = plr
-		end,
-	},
+		end
+
+		for index, bot in ipairs(allBots) do
+			coroutine.wrap(function()
+				while true do
+					task.wait(0.1)
+
+					if not bot.Character or not speakerPlayer.Character then break end
+
+					local botHRP = bot.Character:FindFirstChild("HumanoidRootPart")
+					local speakerHRP = speakerPlayer.Character:FindFirstChild("HumanoidRootPart")
+					if not botHRP or not speakerHRP then break end
+
+					-- Calculate offset position
+					local spacing = 4 -- space between bots
+					local offset = CFrame.new((index - 1) * spacing, 0, -4)
+
+					local targetPosition = speakerHRP.CFrame * offset
+					botHRP.CFrame = botHRP.CFrame:Lerp(targetPosition, 0.2)
+				end
+			end)()
+		end
+	end,
+},
 	jobid = {
 		Name = "jobid",
 		Aliases = {"serverid"},
@@ -499,26 +553,24 @@ cmds = {
 		end,
 	},
 	say = {
-		Name = "say",
-		Aliases = {"chat"},
-		Use = "Says the <message> in chat!",
-		Enabled = true,
-		CommandFunction = function(msg, args, speaker)
-			local tosay
-			
-			if args[1] == "say" then
-				tosay = string.sub(msg, 6)
-			else
-				tosay = string.sub(msg, 8)
-			end
-			
-			local speakerplayer = game.Players:FindFirstChild(speaker)
-			
-			if not speakerplayer then return end
-			
-			if altctrl then chat(tosay) else chat(speakerplayer.DisplayName .. ": " .. tosay) end
-		end,
-	},
+	Name = "say",
+	Aliases = {"chat"},
+	Use = "Says the <message> in chat!",
+	Enabled = true,
+	CommandFunction = function(msg, args, speaker)
+		local tosay
+
+		if args[1] == "say" then
+			tosay = string.sub(msg, 6)
+		else
+			tosay = string.sub(msg, 8)
+		end
+
+		if not game.Players:FindFirstChild(speaker) then return end
+
+		chat(tosay) -- always just say the message, no prefix
+	end,
+},
 	pick = {
 		Name = "pick",
 		Aliases = {"choose"},
@@ -967,7 +1019,7 @@ cmds = {
 	walkspeed = {
 		Name = "walkspeed",
 		Aliases = {"speed"},
-		Use = "Sets LunarBot's walkspeed to <speed>!",
+		Use = "Sets the Bot's walkspeed to <speed>!",
 		Enabled = true,
 		CommandFunction = function(msg, args, speaker)
 			pcall(function()
@@ -988,7 +1040,7 @@ cmds = {
 	fps = {
 		Name = "fps",
 		Aliases = {},
-		Use = "Chats LunarBot's current FPS!",
+		Use = "Chats the Bot's current FPS!",
 		Enabled = true,
 		CommandFunction = function(msg, args, speaker)
 			pcall(function()
@@ -1137,7 +1189,7 @@ cmds = {
 	rush = {
 		Name = "rush",
 		Aliases = {"rushbegin"},
-		Use = "Makes LunarBot turn into Rush from DOORS!",
+		Use = "Makes the Bot turn into Rush (from DOORS)!",
 		Enabled = true,
 		CommandFunction = function(msg, args, speaker)
 			pcall(function()
@@ -1286,14 +1338,14 @@ local cmdcon = messageReceived:Connect(function(data)
 		local cmd = checkCommands(args[1])
 		
 		if status ~= nil and speaker ~= bot.Name then
-			chat("LunarBot Status // " .. status .. " // Commands are disabled.")
+			chat("Bot Status // " .. status .. " // Commands are disabled.")
 			return
 		end
 		
 		if cmd ~= nil then
 			if cmd.Enabled == false then
 				chat("The command " .. cmd.Name .. " is currently disabled. Please request it to be re-enabled by " .. bot.DisplayName .. ".")
-				print("LunarBot CMDLogs // " .. speaker .. " attempted to run command: " .. cmd.Name .. " with arguments: " .. tts(args) .. "while the command was disabled.")
+				print("Alt Control System CMDLogs // " .. speaker .. " attempted to run command: " .. cmd.Name .. " with arguments: " .. tts(args) .. "while the command was disabled.")
 				return
 			else
 				cmd.CommandFunction(message, args, speaker)
@@ -1308,7 +1360,7 @@ local cmdcon = messageReceived:Connect(function(data)
 					return r
 				end
 				
-				print("LunarBot CMDLogs // " .. speaker .. " ran command: " .. cmd.Name .. " with arguments: " .. tts(args))
+				print("Alt Control System CMDLogs // " .. speaker .. " ran command: " .. cmd.Name .. " with arguments: " .. tts(args))
 			end
 		else
 			warn("Could not find command: " .. args[1] .. "!")
@@ -1323,7 +1375,7 @@ bot.Chatted:Connect(function(msg)
 		cmdcon:Disconnect()
 		disconnected = true
 		wait()
-		chat("Successfully disconnected LunarBot.")
+		chat("Successfully disconnected the Bot System.")
 	end
 end)
 
