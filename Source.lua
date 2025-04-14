@@ -193,7 +193,7 @@ cmds = {
 	backshots = {
 	Name = "backshots",
 	Aliases = {},
-	Use = "Bots move back and forth behind the target player.",
+	Use = "Bots move behind the target player and go back and forth while chatting.",
 	Enabled = true,
 	CommandFunction = function(msg, args, speaker)
 		local targetName = args[2]
@@ -209,25 +209,41 @@ cmds = {
 			end
 		end
 
+		local chatMessages = {
+			"👀", "yo chill", "lmao", "nahhh", "👣", "he doesn’t even know", "💀", "this is personal", "backshots mode activated", "locked on", "😂", "can't run"
+		}
+
 		for _, bot in ipairs(allBots) do
+			if bot:FindFirstChild("BackshotsLoop") then
+				bot.BackshotsLoop:Destroy()
+			end
+
+			local loopFlag = Instance.new("BoolValue")
+			loopFlag.Name = "BackshotsLoop"
+			loopFlag.Parent = bot
+
 			task.spawn(function()
-				while true do
+				while loopFlag.Parent do
 					if not target.Character or not target.Character:FindFirstChild("HumanoidRootPart") then break end
 					if not bot.Character or not bot.Character:FindFirstChild("HumanoidRootPart") then break end
 
 					local botHRP = bot.Character.HumanoidRootPart
 
-					-- Get position behind target
-					local backCFrame = targetHRP.CFrame * CFrame.new(0, 0, 3)
-					botHRP.CFrame = CFrame.new(backCFrame.Position, targetHRP.Position)
+					-- Position behind
+					local backPos = targetHRP.CFrame * CFrame.new(0, 0, 3)
+					botHRP.CFrame = CFrame.new(backPos.Position, targetHRP.Position)
 
-					wait(0.3)
+					-- Random chat
+					local msg = chatMessages[math.random(1, #chatMessages)]
+					game.TextChatService.TextChannels.RBXGeneral:SendAsync(bot.Name .. ": " .. msg)
 
-					-- Move closer quickly
-					local closeCFrame = targetHRP.CFrame * CFrame.new(0, 0, 1.5)
-					botHRP.CFrame = CFrame.new(closeCFrame.Position, targetHRP.Position)
+					wait(0.15) -- faster
 
-					wait(0.3)
+					-- Step in close
+					local closePos = targetHRP.CFrame * CFrame.new(0, 0, 1.5)
+					botHRP.CFrame = CFrame.new(closePos.Position, targetHRP.Position)
+
+					wait(0.15) -- faster
 				end
 			end)
 		end
@@ -264,6 +280,21 @@ cmds = {
 			end)
 		end,
 	},
+	unbackshots = {
+	Name = "unbackshots",
+	Aliases = {"stopbackshots"},
+	Use = "Stops all bots from doing the backshots loop.",
+	Enabled = true,
+	CommandFunction = function(msg, args, speaker)
+		for _, bot in ipairs(game.Players:GetPlayers()) do
+			if table.find(whitelisted, bot.Name) and bot.Name ~= speaker then
+				if bot:FindFirstChild("BackshotsLoop") then
+					bot.BackshotsLoop:Destroy()
+				end
+			end
+		end
+	end,
+},
 	sts = {
 	Name = "sts",
 	Aliases = {},
