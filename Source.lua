@@ -194,6 +194,7 @@ cmds = {
 			task.wait(0.3)
 		end
 	end,
+	},
 	backshots = {
 	Name = "backshots",
 	Aliases = {},
