@@ -192,6 +192,36 @@ cmds = {
 		end
 	end,
 	},
+	twerk = {
+	Name = "twerk",
+	Aliases = {},
+	Use = "Makes the bot twerk!",
+	Enabled = true,
+	CommandFunction = function(msg, args, speaker)
+		local animationId = "rbxassetid://7426375440" -- Replace with a different twerk animation if needed
+
+		local function playTwerk(char)
+			if not char then return end
+			local humanoid = char:FindFirstChildOfClass("Humanoid")
+			if not humanoid then return end
+
+			local anim = Instance.new("Animation")
+			anim.AnimationId = animationId
+
+			local track = humanoid:LoadAnimation(anim)
+			track:Play()
+		end
+
+		-- if alt control is enabled, run on all bots
+		if altctrl and allbots then
+			for _, alt in pairs(allbots) do
+				playTwerk(alt.Character)
+			end
+		else
+			playTwerk(bot.Character)
+		end
+	end,
+},
 	backshots = {
 	Name = "backshots",
 	Aliases = {},
