@@ -1,6 +1,5 @@
 local bootTime = tick() -- fallback if os.time is nil
 local disconnected = false
-
 local altctrl = _G.ALTCTRL or false
 local SPIN_POWER = 100
 local FLOAT_HEIGHT = 9
