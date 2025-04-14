@@ -1,6 +1,4 @@
-print("os:", os)
-print("os.time:", os and os.time)
-local bootTime = os.time()
+local bootTime = tick() -- fallback if os.time is nil
 local disconnected = false
 
 local altctrl = _G.ALTCTRL or false
