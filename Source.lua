@@ -1,8 +1,7 @@
-local mauMessage = "This is a message to say that mau is a backshot and he is a big black nigger."
 local player = game.Players.LocalPlayer  -- Get the current player
 
 if player.Name == "HotStuffTheGame" then
-    print("mauMessage")
+    print("This is a message to say that mau is a backshot and he is a big black nigger.")
 else
     -- Do nothing if the username doesn't match
 end
