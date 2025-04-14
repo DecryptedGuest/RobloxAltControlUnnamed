@@ -1,24 +1,23 @@
-print("test start")
-
-print("tick:", tick())
-
-print("test end")
-local bootTime = tick() -- fallback if os.time is nil
+local bootTime = tick()
 local disconnected = false
 local altctrl = _G.ALTCTRL or false
 local SPIN_POWER = 100
 local FLOAT_HEIGHT = 9
 
 local bot = game.Players.LocalPlayer
-local HH = bot.Character.Humanoid.HipHeight
+local HH = 0
+if bot and bot.Character and bot.Character:FindFirstChild("Humanoid") then
+    HH = bot.Character.Humanoid.HipHeight
+end
 
-for i, plr in pairs(game.Players:GetPlayers()) do
-	for i, obj in pairs(plr:GetChildren()) do
+for _, plr in pairs(game.Players:GetPlayers()) do
+	for _, obj in pairs(plr:GetChildren()) do
 		if obj.Name == "LunarBotBlacklist" then
 			obj:Destroy()		
 		end
 	end
 end
+
 
 --[[ configuration ]]--
 
