@@ -215,7 +215,10 @@ cmds = {
 		end
 
 		local chatMessages = {
-			"You like these frontshots?", "this is smooth!", "keep watching me!", "I'm a frontshot expert!"
+			"You like these frontshots?",
+			"This is smooth!",
+			"Keep watching me!",
+			"I'm a frontshot expert!",
 		}
 
 		for _, bot in ipairs(allBots) do
@@ -227,7 +230,7 @@ cmds = {
 			loopFlag.Name = "FrontshotsLoop"
 			loopFlag.Parent = bot
 
-			local lastMessageTime = 0
+			local lastMessageTime = tick()
 
 			task.spawn(function()
 				while loopFlag.Parent do
@@ -238,23 +241,23 @@ cmds = {
 
 					-- Move in front of target
 					local frontPos = targetHRP.CFrame * CFrame.new(0, 0, -3)
-					botHRP.CFrame = CFrame.new(frontPos.Position, targetHRP.Position)
-
-					-- Bend forward by tilting the upper body
-					botHRP.CFrame = botHRP.CFrame * CFrame.Angles(math.rad(30), 0, 0)
+					botHRP.CFrame = frontPos * CFrame.Angles(math.rad(30), 0, 0)
 
 					wait(0.15)
 
 					-- Move closer
 					local closePos = targetHRP.CFrame * CFrame.new(0, 0, -1.5)
-					botHRP.CFrame = CFrame.new(closePos.Position, targetHRP.Position) * CFrame.Angles(math.rad(30), 0, 0)
+					botHRP.CFrame = closePos * CFrame.Angles(math.rad(30), 0, 0)
 
 					wait(0.15)
 
 					-- Say something every 10 seconds
 					if tick() - lastMessageTime >= 10 then
-						local msg = chatMessages[math.random(1, #chatMessages)]
-						game.TextChatService.TextChannels.RBXGeneral:SendAsync(msg)
+						local humanoid = bot.Character:FindFirstChildOfClass("Humanoid")
+						if humanoid then
+							local msg = chatMessages[math.random(1, #chatMessages)]
+							humanoid:Chat(msg)
+						end
 						lastMessageTime = tick()
 					end
 				end
