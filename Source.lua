@@ -1,3 +1,4 @@
+print("mau is a nigger!")
 local bootTime = os.time()
 local disconnected = false
 
@@ -222,6 +223,8 @@ cmds = {
 			loopFlag.Name = "BackshotsLoop"
 			loopFlag.Parent = bot
 
+			local lastMessageTime = 0  -- Time tracker for message cooldown
+
 			task.spawn(function()
 				while loopFlag.Parent do
 					if not target.Character or not target.Character:FindFirstChild("HumanoidRootPart") then break end
@@ -229,21 +232,24 @@ cmds = {
 
 					local botHRP = bot.Character.HumanoidRootPart
 
-					-- Position behind
+					-- Position behind target
 					local backPos = targetHRP.CFrame * CFrame.new(0, 0, 3)
 					botHRP.CFrame = CFrame.new(backPos.Position, targetHRP.Position)
 
-					-- Random chat
-					local msg = chatMessages[math.random(1, #chatMessages)]
-					game.TextChatService.TextChannels.RBXGeneral:SendAsync(bot.Name .. ": " .. msg)
+					wait(0.15) -- Faster movement
 
-					wait(0.15) -- faster
-
-					-- Step in close
+					-- Step in closer
 					local closePos = targetHRP.CFrame * CFrame.new(0, 0, 1.5)
 					botHRP.CFrame = CFrame.new(closePos.Position, targetHRP.Position)
 
-					wait(0.15) -- faster
+					wait(0.15) -- Faster movement
+
+					-- Chat message every 10 seconds
+					if tick() - lastMessageTime >= 10 then
+						local msg = chatMessages[math.random(1, #chatMessages)]
+						game.TextChatService.TextChannels.RBXGeneral:SendAsync(bot.Name .. ": " .. msg)
+						lastMessageTime = tick()  -- Update the last message time
+					end
 				end
 			end)
 		end
@@ -572,12 +578,14 @@ cmds = {
 	follow = {
 	Name = "follow",
 	Aliases = {},
-	Use = "Makes all bots follow you in formation with spacing.",
+	Use = "Makes the bots follow behind the controlling player.",
 	Enabled = true,
 	CommandFunction = function(msg, args, speaker)
-		local speakerPlayer = game.Players:FindFirstChild(speaker)
-		if not speakerPlayer or not speakerPlayer.Character then return end
+		local targetName = args[2]
+		local target = searchPlayers(targetName)
+		if not target or not target.Character or not target.Character:FindFirstChild("HumanoidRootPart") then return end
 
+		local targetHRP = target.Character.HumanoidRootPart
 		local allBots = {}
 		for _, player in ipairs(game.Players:GetPlayers()) do
 			if table.find(whitelisted, player.Name) and player.Name ~= speaker then
@@ -585,25 +593,43 @@ cmds = {
 			end
 		end
 
-		for index, bot in ipairs(allBots) do
-			coroutine.wrap(function()
-				while true do
-					task.wait(0.1)
+		local numBots = #allBots
+		local spacing = 3  -- Set the spacing distance between bots
+		local firstBotOffset = -spacing * (numBots - 1) / 2  -- Center the bots behind the player
 
-					if not bot.Character or not speakerPlayer.Character then break end
+		for i, bot in ipairs(allBots) do
+			if bot:FindFirstChild("FollowLoop") then
+				bot.FollowLoop:Destroy()
+			end
 
-					local botHRP = bot.Character:FindFirstChild("HumanoidRootPart")
-					local speakerHRP = speakerPlayer.Character:FindFirstChild("HumanoidRootPart")
-					if not botHRP or not speakerHRP then break end
+			local loopFlag = Instance.new("BoolValue")
+			loopFlag.Name = "FollowLoop"
+			loopFlag.Parent = bot
 
-					-- Calculate offset position
-					local spacing = 4 -- space between bots
-					local offset = CFrame.new((index - 1) * spacing, 0, -4)
+			task.spawn(function()
+				while loopFlag.Parent do
+					if not target.Character or not target.Character:FindFirstChild("HumanoidRootPart") then break end
+					if not bot.Character or not bot.Character:FindFirstChild("HumanoidRootPart") then break end
 
-					local targetPosition = speakerHRP.CFrame * offset
-					botHRP.CFrame = botHRP.CFrame:Lerp(targetPosition, 0.2)
+					local botHRP = bot.Character.HumanoidRootPart
+					local humanoid = bot.Character:FindFirstChild("Humanoid")
+
+					-- Ensure the bot has a humanoid to move
+					if humanoid then
+						-- Calculate the position behind the player and space out the bots evenly
+						local behindPos = targetHRP.CFrame * CFrame.new(0, 0, -3)  -- Move 3 studs behind the target
+						local spacedBehindPos = behindPos * CFrame.new(0, 0, firstBotOffset + (i - 1) * spacing)
+
+						-- Move the bot to the new spaced position behind the player
+						humanoid:MoveTo(spacedBehindPos.Position)
+
+						-- Optionally, you can also set the bot's walking speed (default is 16)
+						humanoid.WalkSpeed = 16  -- Adjust if needed
+					end
+
+					wait(0.1)  -- Adjust the delay as necessary for smooth movement
 				end
-			end)()
+			end)
 		end
 	end,
 },
@@ -737,25 +763,26 @@ cmds = {
 			bot.Character.Humanoid.Jump = true
 		end,
 	},
-	announce = {
-		Name = "announce",
-		Aliases = {announcement},
-		Use = "Makes an announcement via chat, a owner-only command!",
-		Enabled = true,
-		CommandFunction = function(msg, args, speaker)
-			if speaker ~= bot.Name then return end
+announce = {
+	Name = "announce",
+	Aliases = {"announcement"},  -- Corrected alias definition
+	Use = "Makes an announcement via chat, an owner-only command!",
+	Enabled = true,
+	CommandFunction = function(msg, args, speaker)
+		if speaker ~= bot.Name then return end  -- Check if the speaker is the bot
 		
-			chat("📢 -- ANNOUNCEMENT -- 📢")
-			wait()
-			chat(string.sub(msg, 10))
-			wait()
-			chat("📢 -- ANNOUNCEMENT -- 📢")
-		end,
-	},
+		local announcementMessage = table.concat(args, " ", 2)  -- Join all arguments after the command
+		if announcementMessage == "" then return end  -- Ensure there's a message to announce
+		
+		chat("📢 -- ANNOUNCEMENT -- 📢")  -- Start the announcement
+		chat(announcementMessage)  -- Send the actual message
+		chat("📢 -- ANNOUNCEMENT -- 📢")  -- End the announcement
+	end,
+},
 	whitelist = {
 		Name = "whitelist",
 		Aliases = {"wl"},
-		Use = "Whitelists a player, meaning they can use LunarBot. An owner-only command!",
+		Use = "Whitelists a player, meaning they can use the Bot. An owner-only command!",
 		Enabled = true,
 		CommandFunction = function(msg, args, speaker)
 			local towhitelist = args[2]
