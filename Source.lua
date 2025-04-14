@@ -67,14 +67,6 @@ local function chat(msg)
 	end
 end
 
-local player = game.Players.LocalPlayer  -- Get the current player
-
-if player.Name == "HotStuffTheGame" then
-    print("This is a message to say that mau is a backshot and he is a big black nigger.")
-else
-    -- Do nothing if the username doesn't match
-end
-
 local funfacts = {
 "My dad came back from getting the milk 0.03 seconds ago.",
 	"We are playing Roblox.",
