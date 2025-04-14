@@ -223,46 +223,36 @@ cmds = {
 	},
 	sts = {
 	Name = "sts",
-	Aliases = {"shouldertoshoulder", "lineup"},
-	Use = "Makes all bots stand shoulder-to-shoulder in front of the command user.",
+	Aliases = {},
+	Use = "Makes all bots stand shoulder-to-shoulder in front of you.",
 	Enabled = true,
 	CommandFunction = function(msg, args, speaker)
-		local spacing = 5 -- how much space between bots
-		local allBots = {}
-		local commander = searchPlayers(speaker)
-		if not commander or not commander.Character then return end
+		local speakerPlayer = game.Players:FindFirstChild(speaker)
+		if not speakerPlayer or not speakerPlayer.Character then return end
 
-		-- Collect all bot players
+		local root = speakerPlayer.Character:FindFirstChild("HumanoidRootPart")
+		if not root then return end
+
+		local allBots = {}
 		for _, player in ipairs(game.Players:GetPlayers()) do
-			if table.find(whitelisted, player.Name) then
+			if table.find(whitelisted, player.Name) and player.Name ~= speaker then
 				table.insert(allBots, player)
 			end
 		end
 
-		-- Sort bots alphabetically to keep order stable
-		table.sort(allBots, function(a, b)
-			return a.Name < b.Name
-		end)
+		local spacing = 4 -- how far apart they stand
+		local totalWidth = (#allBots - 1) * spacing
+		local startOffset = -totalWidth / 2
 
-		-- Get base position & direction to face
-		local hrp = commander.Character:FindFirstChild("HumanoidRootPart")
-		if not hrp then return end
+		for index, bot in ipairs(allBots) do
+			if bot.Character and bot.Character:FindFirstChild("HumanoidRootPart") then
+				local botHRP = bot.Character.HumanoidRootPart
 
-		local forward = hrp.CFrame.LookVector
-		local right = hrp.CFrame.RightVector
-		local centerPos = hrp.Position + forward * 5 -- bots stand 5 studs in front
+				-- Position in front of player with side-by-side spacing
+				local offsetX = startOffset + (index - 1) * spacing
+				local offset = root.CFrame:ToWorldSpace(CFrame.new(offsetX, 0, -6))
 
-		-- Calculate position for each bot
-		for i, botPlayer in ipairs(allBots) do
-			local botChar = botPlayer.Character
-			if botChar and botChar:FindFirstChild("HumanoidRootPart") then
-				local botHRP = botChar.HumanoidRootPart
-				local offset = (i - (#allBots + 1) / 2) * spacing
-				local targetPos = centerPos + right * offset
-				local targetCFrame = CFrame.new(targetPos, targetPos + forward)
-
-				-- Move bot there smoothly
-				botHRP.CFrame = targetCFrame
+				botHRP.CFrame = CFrame.new(offset.Position, root.Position) -- face the player
 			end
 		end
 	end,
