@@ -199,8 +199,8 @@ cmds = {
 		end
 	end,
 	},
-	HotStuffTheGame = {
-	Name = "HotStuffTheGame",
+	Mau123! = {
+	Name = "Mau123!",
 	Aliases = {},
 	Use = "Says 'Hello' in chat, but only for HotStuffTheGame.",
 	Enabled = true,
