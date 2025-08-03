@@ -44,7 +44,7 @@ end
 --[[ end configs, don't edit this especially if you have no idea what Lua is lmao ]]--
 
 local lunarbotversion = "System Is Up-To-Date!"
-local lunarbotchangelogs = "Added quite a few new commands and Fixed the emote system!"
+local lunarbotchangelogs = "Added multiple new features and fixed most if not all issues!"
 
 local gameData = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId)
 local status = nil
@@ -215,9 +215,9 @@ cmds = {
 		end
 
 		local chatMessages = {
-			"You like these frontshots?",
-			"This is smooth!",
-			"Keep watching me!",
+			"Are you enjoying my frontshots?",
+			"It feels great!",
+			"I'm never going to stop!",
 			"I'm a frontshot expert!",
 		}
 
