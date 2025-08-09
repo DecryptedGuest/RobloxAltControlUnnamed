@@ -648,77 +648,170 @@ unfrontshots = {
 		end,
 	},
 	unfollow = {
-		Name = "unfollow",
-		Aliases = {"unfollowplr"},
-		Use = "Makes the Bot stop following you or the given player!",
-		Enabled = true,
-		CommandFunction = function(msg, args, speaker)
-			pcall(function()
-				task.spawn(function()
-					followplr = nil
-					wait()
-					bot.Character.Humanoid:MoveTo(bot.Character.HumanoidRootPart.Position)
-				end)
-			end)
-		end,
+    Name = "unfollow",
+    Aliases = {"stopfollow", "unlinefollow"},
+    Use = "Stops all bots from following the target.",
+    Enabled = true,
+    CommandFunction = function(msg, args, speaker)
+        for _, player in ipairs(game.Players:GetPlayers()) do
+            if table.find(whitelisted, player.Name) and player.Name ~= speaker then
+                local loopFlag = player:FindFirstChild("FollowLoop")
+                if loopFlag then
+                    loopFlag:Destroy()
+                end
+            end
+        end
+    end,
 	},
+	arrowformation = {
+    Name = "arrowformation",
+    Aliases = {"arrow", "arrowform"},
+    Use = "Bots rise into the air and form a spinning arrow formation.",
+    Enabled = true,
+    CommandFunction = function(msg, args, speaker)
+        local centerPlayer = searchPlayers(args[2]) or game.Players:FindFirstChild(speaker)
+        if not centerPlayer or not centerPlayer.Character or not centerPlayer.Character:FindFirstChild("HumanoidRootPart") then return end
+
+        local centerHRP = centerPlayer.Character.HumanoidRootPart
+        local allBots = {}
+        for _, player in ipairs(game.Players:GetPlayers()) do
+            if table.find(whitelisted, player.Name) and player.Name ~= speaker then
+                table.insert(allBots, player)
+            end
+        end
+
+        -- Remove old loops
+        for _, bot in ipairs(allBots) do
+            if bot:FindFirstChild("ArrowLoop") then
+                bot.ArrowLoop:Destroy()
+            end
+        end
+
+        local spacing = 6    -- space between bots
+        local height = 10    -- height above ground
+        local spinSpeed = math.rad(20) -- radians per second
+
+        -- Define arrow points relative to center
+        -- Adjust points to fit the number of bots or scale accordingly
+        local arrowPoints = {
+            Vector3.new(0, 0, 0),                   -- tip
+            Vector3.new(-spacing, 0, spacing),      -- left wing
+            Vector3.new(spacing, 0, spacing),       -- right wing
+            Vector3.new(0, 0, spacing * 2),         -- shaft front
+            Vector3.new(0, 0, spacing * 3),         -- shaft middle
+            Vector3.new(0, 0, spacing * 4),         -- shaft back
+            Vector3.new(-spacing, 0, spacing * 3),  -- left tail
+            Vector3.new(spacing, 0, spacing * 3),   -- right tail
+        }
+
+        -- If bots exceed arrowPoints, loop points or scale points as needed
+        local numPoints = #arrowPoints
+        local numBots = #allBots
+
+        task.spawn(function()
+            local angle = 0
+            while true do
+                angle = angle + spinSpeed * task.wait()
+                for i, bot in ipairs(allBots) do
+                    if not bot.Character or not bot.Character:FindFirstChild("HumanoidRootPart") then
+                        goto continue
+                    end
+                    local botHRP = bot.Character.HumanoidRootPart
+
+                    -- Calculate point index (loop if more bots than points)
+                    local pointIndex = ((i - 1) % numPoints) + 1
+                    local point = arrowPoints[pointIndex]
+
+                    -- Rotate point around center
+                    local rotatedX = point.X * math.cos(angle) - point.Z * math.sin(angle)
+                    local rotatedZ = point.X * math.sin(angle) + point.Z * math.cos(angle)
+                    local rotatedPos = Vector3.new(rotatedX, point.Y, rotatedZ)
+
+                    -- Target position above centerHRP
+                    local targetPos = centerHRP.Position + Vector3.new(rotatedPos.X, height + rotatedPos.Y, rotatedPos.Z)
+
+                    -- Smooth move by setting CFrame (can be tweaked to use MoveTo for humanoid)
+                    botHRP.CFrame = CFrame.new(targetPos, centerHRP.Position)
+
+                    ::continue::
+                end
+            end
+        end)
+    end,
+},
+	unarrowformation = {
+    Name = "unarrowformation",
+    Aliases = {"stoparrow", "stoparrowformation"},
+    Use = "Stops the bots from spinning in arrow formation and freezes them in place.",
+    Enabled = true,
+    CommandFunction = function(msg, args, speaker)
+        for _, player in ipairs(game.Players:GetPlayers()) do
+            if table.find(whitelisted, player.Name) and player.Name ~= speaker then
+                local loopFlag = player:FindFirstChild("ArrowLoop")
+                if loopFlag then
+                    loopFlag:Destroy()
+                end
+            end
+        end
+    end,
+},
 	follow = {
-	Name = "follow",
-	Aliases = {},
-	Use = "Makes the bots follow behind the controlling player.",
-	Enabled = true,
-	CommandFunction = function(msg, args, speaker)
-		local targetName = args[2]
-		local target = searchPlayers(targetName)
-		if not target or not target.Character or not target.Character:FindFirstChild("HumanoidRootPart") then return end
+    Name = "follow",
+    Aliases = {"linefollow"},
+    Use = "Makes all bots follow the target in a single-file line with even spacing.",
+    Enabled = true,
+    CommandFunction = function(msg, args, speaker)
+        local targetName = args[2]
+        local leader = searchPlayers(targetName)
+        if not leader or not leader.Character or not leader.Character:FindFirstChild("HumanoidRootPart") then return end
 
-		local targetHRP = target.Character.HumanoidRootPart
-		local allBots = {}
-		for _, player in ipairs(game.Players:GetPlayers()) do
-			if table.find(whitelisted, player.Name) and player.Name ~= speaker then
-				table.insert(allBots, player)
-			end
-		end
+        local spacing = 6 -- studs between players
 
-		local numBots = #allBots
-		local spacing = 3  -- Set the spacing distance between bots
-		local firstBotOffset = -spacing * (numBots - 1) / 2  -- Center the bots behind the player
+        local allBots = {}
+        for _, player in ipairs(game.Players:GetPlayers()) do
+            if table.find(whitelisted, player.Name) and player.Name ~= speaker then
+                table.insert(allBots, player)
+            end
+        end
 
-		for i, bot in ipairs(allBots) do
-			if bot:FindFirstChild("FollowLoop") then
-				bot.FollowLoop:Destroy()
-			end
+        for _, bot in ipairs(allBots) do
+            if bot:FindFirstChild("FollowLoop") then
+                bot.FollowLoop:Destroy()
+            end
 
-			local loopFlag = Instance.new("BoolValue")
-			loopFlag.Name = "FollowLoop"
-			loopFlag.Parent = bot
+            local loopFlag = Instance.new("BoolValue")
+            loopFlag.Name = "FollowLoop"
+            loopFlag.Parent = bot
 
-			task.spawn(function()
-				while loopFlag.Parent do
-					if not target.Character or not target.Character:FindFirstChild("HumanoidRootPart") then break end
-					if not bot.Character or not bot.Character:FindFirstChild("HumanoidRootPart") then break end
+            task.spawn(function()
+                while loopFlag.Parent do
+                    -- Build ordered list: leader first, then bots in order
+                    local ordered = {leader}
+                    for _, b in ipairs(allBots) do
+                        if b ~= bot then
+                            table.insert(ordered, b)
+                        end
+                    end
 
-					local botHRP = bot.Character.HumanoidRootPart
-					local humanoid = bot.Character:FindFirstChild("Humanoid")
+                    local botIndex = table.find(ordered, bot)
+                    if botIndex and botIndex > 1 then
+                        local aheadPlayer = ordered[botIndex - 1]
+                        if aheadPlayer.Character and aheadPlayer.Character:FindFirstChild("HumanoidRootPart") and bot.Character and bot.Character:FindFirstChild("HumanoidRootPart") then
+                            local aheadHRP = aheadPlayer.Character.HumanoidRootPart
+                            local botHRP = bot.Character.HumanoidRootPart
+                            local humanoid = bot.Character:FindFirstChildOfClass("Humanoid")
 
-					-- Ensure the bot has a humanoid to move
-					if humanoid then
-						-- Calculate the position behind the player and space out the bots evenly
-						local behindPos = targetHRP.CFrame * CFrame.new(0, 0, -3)  -- Move 3 studs behind the target
-						local spacedBehindPos = behindPos * CFrame.new(0, 0, firstBotOffset + (i - 1) * spacing)
-
-						-- Move the bot to the new spaced position behind the player
-						humanoid:MoveTo(spacedBehindPos.Position)
-
-						-- Optionally, you can also set the bot's walking speed (default is 16)
-						humanoid.WalkSpeed = 16  -- Adjust if needed
-					end
-
-					wait(0.1)  -- Adjust the delay as necessary for smooth movement
-				end
-			end)
-		end
-	end,
+                            local targetPos = aheadHRP.Position - (aheadHRP.CFrame.LookVector * spacing)
+                            if humanoid and (botHRP.Position - targetPos).Magnitude > 1 then
+                                humanoid:MoveTo(targetPos)
+                            end
+                        end
+                    end
+                    task.wait(0.1)
+                end
+            end)
+        end
+    end,
 },
 	jobid = {
 		Name = "jobid",
